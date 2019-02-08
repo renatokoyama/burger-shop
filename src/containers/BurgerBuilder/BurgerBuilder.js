@@ -19,8 +19,23 @@ class BurgerBuilder extends Component {
             cheese: 0,
             meat: 0
         },
-        totalPrice: 4
+        totalPrice: 4,
+        purchasable: false
+    }
 
+    getPurchaseState(ingredientsList) {
+        const ingredients = {
+            ...ingredientsList
+        }
+
+        const sum = Object.keys(ingredients)
+            .map(igKey => {
+                return ingredients[igKey]
+            }).reduce(((sum, element) => {
+                return sum + element
+            }), 0);
+
+        return sum > 0;
     }
 
     addIngredientsHandler = (type) => {
@@ -30,11 +45,15 @@ class BurgerBuilder extends Component {
             }
             updatedIngredients[type] = previousState.ingredients[type] + 1;
             const newPrice = previousState.totalPrice + INGREDIENT_PRICES[type]
+            const purchasable = this.getPurchaseState(updatedIngredients);
             return {
                 totalPrice: newPrice,
-                ingredients: updatedIngredients
+                ingredients: updatedIngredients,
+                purchasable: purchasable
             }
+
         })
+
     }
 
     removeIngredientsHandler = (type) => {
@@ -49,10 +68,16 @@ class BurgerBuilder extends Component {
             }
             updatedIngredients[type] = ingredientsCount - 1;
             const newPrice = previousState.totalPrice - INGREDIENT_PRICES[type]
+
+
+            const purchasable = this.getPurchaseState(updatedIngredients);
+
             return {
                 totalPrice: newPrice,
-                ingredients: updatedIngredients
+                ingredients: updatedIngredients,
+                purchasable
             }
+
         })
     }
 
@@ -72,6 +97,7 @@ class BurgerBuilder extends Component {
                     ingredientRemoved={this.removeIngredientsHandler}
                     disabledIngredients={disabledIngredients}
                     price={this.state.totalPrice}
+                    purchasable={this.state.purchasable}
                 />
             </Aux>
         );
